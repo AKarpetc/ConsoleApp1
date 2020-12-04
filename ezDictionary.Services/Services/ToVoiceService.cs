@@ -10,34 +10,37 @@ namespace ezDictionary.Services.Services
 {
     public class ToVoiceService
     {
-        private ParametersBuilder parameters;
+
+        private VoiceParametersBuilder parameters;
 
         public void SetParameters(ParametersBuilder parameters)
         {
-            this.parameters = parameters;
+            if (!(parameters is VoiceParametersBuilder))
+            {
+                throw new ArgumentException("Ошибка входного параметра трубектся параметр типа VoiceParametersBuilder");
+            }
+
+            this.parameters = (VoiceParametersBuilder)parameters;
         }
 
-        public async Task<MemoryStream> GetFile(string en)
+        public async Task<byte[]> GetFile(string text)
         {
-            try
+            parameters.SetText(text);
+            string url = parameters.Build();
+
+            var uri = new Uri(url);
+            HttpClient client = new HttpClient();
+            var response = await client.GetAsync(uri);
+
+            var puth = string.Format("{0}.mp3", text);
+
+            using (var fs = new MemoryStream())
             {
-                var uri = new Uri($"https://translate.google.com.vn/translate_tts?ie=UTF-8&q={en}&tl=en&client=tw-ob");
-                HttpClient client = new HttpClient();
-                var response = await client.GetAsync(uri);
+                await response.Content.CopyToAsync(fs);
 
-                var puth = string.Format("{0}.mp3", en);
-
-                using (var fs = new MemoryStream())
-                {
-                    await response.Content.CopyToAsync(fs);
-                    return fs;
-                }
-
+                return fs.ToArray();
             }
-            catch (Exception ex)
-            {
-                return null;
-            }
+
         }
     }
 }

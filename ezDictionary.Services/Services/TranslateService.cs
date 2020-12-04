@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ezDictionary.Services.Services
 {
-    public class TranslateService : ITranslationService
+    public class TranslateService
     {
         private string _key;
         private string _url;
@@ -22,7 +23,7 @@ namespace ezDictionary.Services.Services
         }
 
 
-        public async Task<string> Translate(string ru)
+        public async Task<TranslationsModel> Translate(string ru)
         {
             try
             {
@@ -54,11 +55,12 @@ namespace ezDictionary.Services.Services
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
                     Console.WriteLine(body);
+                    return JsonConvert.DeserializeObject<List<TranslationsModel>>(body).FirstOrDefault();
                 }
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return null;
             }
 
             return null;

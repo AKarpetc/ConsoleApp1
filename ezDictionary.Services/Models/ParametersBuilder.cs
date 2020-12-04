@@ -4,22 +4,35 @@ using System.Text;
 
 namespace ezDictionary.Services.Models
 {
-    public class ParametersBuilder
+    public abstract class ParametersBuilder
     {
-        public virtual ParametersBuilder SetFrom()
+        protected string url;
+        protected string lang;
+    
+
+        public virtual ParametersBuilder SetOriginLanguage(Lang lang)
         {
+            this.lang = lang.ToString();
             return this;
         }
 
-        public virtual ParametersBuilder SetFrom()
+        public virtual ParametersBuilder SetUrl(string url)
         {
+            this.url = url;
             return this;
         }
 
-        internal virtual string Build()
-        {
-            return "";
-        }
+
+
+
+        internal abstract string Build();
+
+    }
+
+    public enum Lang
+    {
+        en,
+        ru
     }
 
 }
